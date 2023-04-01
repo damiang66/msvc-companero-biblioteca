@@ -20,15 +20,17 @@ import java.util.Optional;
 public class AutorControlador {
     @Autowired
     private AutorService service;
+
     /**
      * metodo para validar
+     *
      * @param result
      * @return
      */
-    private ResponseEntity<?>validar(BindingResult result){
-        Map<String,Object> errores = new HashMap<>();
-        result.getFieldErrors().forEach(e->{
-            errores.put(e.getField(),"El campo: "+ e.getField() + ""+ e.getDefaultMessage());
+    private ResponseEntity<?> validar(BindingResult result) {
+        Map<String, Object> errores = new HashMap<>();
+        result.getFieldErrors().forEach(e -> {
+            errores.put(e.getField(), "El campo: " + e.getField() + "" + e.getDefaultMessage());
 
         });
         return new ResponseEntity<>(errores, HttpStatus.FOUND);
@@ -36,33 +38,36 @@ public class AutorControlador {
 
     /**
      * metodo para listar todos
+     *
      * @return
      */
     @GetMapping
-    public ResponseEntity<?> listar(){
+    public ResponseEntity<?> listar() {
         return ResponseEntity.ok().body(service.findAll());
     }
 
     /**
      * metodo para paginar
+     *
      * @param page
      * @return
      */
     @GetMapping("/paginar/{page}")
-    public ResponseEntity<?>paginar(@PathVariable Integer page){
-        Pageable pageable = PageRequest.of(page,4);
+    public ResponseEntity<?> paginar(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 4);
         return ResponseEntity.ok().body(service.paginar(pageable));
     }
 
     /**
      * metoto para buscar un autor por id
+     *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?>buscarPorid(@PathVariable Long id){
+    public ResponseEntity<?> buscarPorid(@PathVariable Long id) {
         Optional<Autor> r = service.findById(id);
-        if (r.isPresent()){
+        if (r.isPresent()) {
             return ResponseEntity.ok().body(r.get());
         }
         return ResponseEntity.notFound().build();
@@ -70,16 +75,54 @@ public class AutorControlador {
 
     /**
      * metodo para guardar
+     *
      * @param autor
      * @param result
      * @return
      */
     @PostMapping
-    public ResponseEntity<?>guardar(@Valid @RequestBody Autor autor, BindingResult result){
-        if (result.hasErrors()){
+    public ResponseEntity<?> guardar(@Valid @RequestBody Autor autor, BindingResult result) {
+        if (result.hasErrors()) {
             return validar(result);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(autor));
+    }
+
+    /**
+     * metodo para editar
+     *
+     * @param autor
+     * @param result
+     * @param id
+     * @return
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@Valid @RequestBody Autor autor, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return this.validar(result);
+        }
+        Optional<Autor> r = service.findById(id);
+        if (r.isPresent()) {
+            Autor autorDb = r.get();
+            autorDb.setNombre(autor.getNombre());
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.save(autorDb));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
+     * metodo para validar
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Optional<Autor> r = service.findById(id);
+        if (r.isPresent()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }
