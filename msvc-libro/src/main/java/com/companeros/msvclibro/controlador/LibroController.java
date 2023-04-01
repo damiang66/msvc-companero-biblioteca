@@ -74,6 +74,11 @@ public class LibroController {
         return ResponseEntity.ok().body(service.findAllAutor());
     }
 
+    /**
+     * metodo para buscar un autor por id desde libro
+     * @param id
+     * @return
+     */
 
     @GetMapping("/autor/{id}")
     public ResponseEntity<?>buscarAutor(@PathVariable Long id){
@@ -109,6 +114,7 @@ public class LibroController {
         if (result.hasErrors()){
             return validar(result);
         }
+        libro.setIdAutor(libro.getAutor().getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(libro));
     }
 
@@ -134,6 +140,7 @@ public class LibroController {
             Optional<Autor>r = service.findByAutor(libro.getAutor().getId());
                 if (r.isPresent()){
                     libroDb.setAutor(r.get());
+                    libroDb.setIdAutor(r.get().getId());
                     return ResponseEntity.status(HttpStatus.CREATED).body(service.save(libroDb));
                 }
                 response.put("error", "el autor no exite o no puede estar vacio");

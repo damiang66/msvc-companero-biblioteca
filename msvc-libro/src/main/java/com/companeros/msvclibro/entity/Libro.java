@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -15,11 +16,15 @@ public class Libro {
     private Long id;
     @NotBlank
     private String nombre;
-    @NotBlank
+    @NotNull
     private Integer ejemplares;
     @Temporal(TemporalType.DATE)
     private Date fecha;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Long idAutor;
+    @Transient
     private Autor autor;
-
+    @PrePersist
+    public void pre(){
+        this.fecha= new Date();
+    }
 }

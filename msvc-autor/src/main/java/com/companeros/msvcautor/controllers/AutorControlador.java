@@ -120,6 +120,7 @@ public class AutorControlador {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Optional<Autor> r = service.findById(id);
         if (r.isPresent()) {
+            service.delete(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
