@@ -1,0 +1,55 @@
+version: "3.7"
+services:
+   msvc-eureka:
+     image: msvc-eureka:latest
+     ports:
+       - "8761:8761"
+     restart: always
+     networks:
+       - spring
+   msvc-mysql:
+      image: mysql:8
+      ports:
+        - "3307:3306"
+      restart: always
+      networks:
+        - spring
+      environment:
+        MYSQL_DATABASE: db_biblioteca
+        MYSQL_ROOT_PASSWORD: root
+
+   msvc-autor:
+     image: msvc-autor:latest
+     restart: always
+     networks:
+       - spring
+     depends_on:
+       - msvc-eureka
+       - msvc-mysql
+   msvc-libro:
+     image: msvc-libro:latest
+     restart: always
+     ports:
+
+       - "8007:8007"
+     networks:
+       - spring
+     depends_on:
+       - msvc-eureka
+       - msvc-mysql
+
+   msvc-gateway:
+     image: msvc-gateway:latest
+     restart: always
+     ports:
+       - "8090:8090"
+     networks:
+       - spring
+     depends_on:
+       - msvc-eureka
+       - msvc-autor
+       - msvc-libro
+
+
+networks:
+  spring:
